@@ -26,27 +26,33 @@ class Session(object):
 
         self.patterns = patterns
 
-    def _get_row_groups(self, grid, min=3):
+    def get_regular_groups(self, grid, min=3):
+        """Return all row and column groups."""
+        row_groups = self._get_row_groups(grid.grid, models.patterns.RowPattern, min)
+        col_groups = self._get_row_groups(grid.grid.T, models.patterns.ColumnPattern, min)
+        return row_groups + col_groups
+
+    def _get_row_groups(self, array, pattern, min):
         """Return groups with a min size that exist with grid on x-axis."""
         groups = []
 
-        for col in xrange(len(grid.grid)):
-            row = grid.grid[col]
+        for row, col in zip(array, xrange(len(array))):
             start = 0
 
             while start + min <= len(row):
-
-                match_size = 1
+                size = 1
                 orb_type = type(row[start])
 
                 for cell in xrange(start + 1, len(row)):
                     if orb_type != type(row[cell]):
                         break
-                    match_size += 1
+                    size += 1
                     start += 1
 
-                if match_size >= min:
-                    groups.append(models.patterns.Pattern(orb_type, match_size))
+                if size >= min:
+                    groups.append(pattern(
+                        orb_type, size, (col, start - size + 1)
+                    ))
 
                 start += 1
 
