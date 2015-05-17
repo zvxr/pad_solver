@@ -29,12 +29,25 @@ class Session(object):
     def _get_row_groups(self, grid, min=3):
         """Return groups with a min size that exist with grid on x-axis."""
         groups = []
-        for col in xrange(len(grid.grid) / len(grid.grid[0]) + 1):
+
+        for col in xrange(len(grid.grid)):
             row = grid.grid[col]
-            for offset in xrange(len(row) / min + 1):
-                if offset + min > len(row):
-                    break
-                if len(set([type(cell) for cell in row[offset:offset + min]])) == 1:
-                    groups.append((col, row[offset]))
-            # TODO: Handle where len(row) / min > 1.0
+            start = 0
+
+            while start + min <= len(row):
+
+                match_size = 1
+                orb_type = type(row[start])
+
+                for cell in xrange(start + 1, len(row)):
+                    if orb_type != type(row[cell]):
+                        break
+                    match_size += 1
+                    start += 1
+
+                if match_size >= min:
+                    groups.append(models.patterns.Pattern(orb_type, match_size))
+
+                start += 1
+
         return groups
