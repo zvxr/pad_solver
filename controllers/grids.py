@@ -34,3 +34,7 @@ def swap(grid, cursor, direction):
     # Make the switch
     grid.grid[to_position] = from_orb
     grid.grid[from_position] = to_orb
+
+    # Update graphic
+    grid.grid[to_position].select()
+    grid.grid[from_position].deselect()
